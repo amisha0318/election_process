@@ -22,6 +22,9 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <a href="#main-content" className="sr-only focus:not-sr-only absolute top-4 left-4 z-[100] bg-blue-600 text-white px-4 py-2 rounded-lg font-bold">
+        Skip to content
+      </a>
       {/* Navigation */}
       <nav className="sticky top-0 z-50 glass-card mx-4 mt-4 px-6 py-4 flex items-center justify-between border-b-0">
         <div className="flex items-center gap-2">
@@ -31,27 +34,33 @@ function App() {
           <h1 className="text-2xl font-bold tracking-tight">Vote<span className="text-blue-500">Wise</span></h1>
         </div>
 
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                activeTab === tab.id 
-                ? 'bg-blue-600 text-white' 
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <tab.icon size={18} />
-              <span className="font-medium">{tab.label}</span>
-            </button>
-          ))}
-        </div>
+        <div className="flex items-center gap-4">
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center gap-1">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === tab.id 
+                  ? 'bg-blue-600 text-white' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <tab.icon size={18} />
+                <span className="font-medium">{tab.label}</span>
+              </button>
+            ))}
+          </div>
 
-        <button className="md:hidden p-2 text-slate-400 hover:text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+          <button className="p-2 text-slate-400 hover:text-white flex items-center gap-2 text-xs font-bold uppercase border border-white/10 rounded-lg">
+            <Globe size={14} /> EN/ES
+          </button>
+          
+          <button className="md:hidden p-2 text-slate-400 hover:text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </nav>
 
       {/* Mobile Menu */}
@@ -83,7 +92,7 @@ function App() {
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="flex-grow container mx-auto px-4 py-12">
+      <main id="main-content" tabIndex="-1" className="flex-grow container mx-auto px-4 py-12 outline-none">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
             <motion.div

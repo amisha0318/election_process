@@ -1,8 +1,15 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { Calendar, ChevronRight, UserPlus, Mic, CheckSquare, Flag, Vote, Award, Landmark } from 'lucide-react';
+import { useState, useCallback, useMemo } from 'react';
+import { ChevronRight, UserPlus, Mic, CheckSquare, Flag, Vote, Award, Landmark } from 'lucide-react';
 
 const TimelineStep = ({ step, index, isActive, onToggle }) => {
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onToggle();
+    }
+  };
+
   return (
     <div className="relative pl-10 pb-12 border-l-2 border-slate-800 last:border-0 last:pb-0">
       <motion.div
@@ -14,7 +21,14 @@ const TimelineStep = ({ step, index, isActive, onToggle }) => {
         } transition-all duration-300`}
       />
       
-      <div className="cursor-pointer group" onClick={onToggle}>
+      <div 
+        role="button"
+        tabIndex="0"
+        aria-expanded={isActive}
+        onKeyDown={handleKeyDown}
+        onClick={onToggle}
+        className="cursor-pointer group outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg p-2 -m-2"
+      >
         <div className="flex items-center gap-4 mb-2">
           <span className="text-sm font-bold text-blue-500 tracking-wider uppercase">{step.period}</span>
           <div className="h-[1px] flex-grow bg-slate-800 group-hover:bg-blue-500/30 transition-colors" />
@@ -42,7 +56,7 @@ const TimelineStep = ({ step, index, isActive, onToggle }) => {
         
         {!isActive && (
           <p className="text-slate-500 text-sm flex items-center gap-1 group-hover:text-slate-400 transition-colors">
-            Click to expand <ChevronRight size={14} />
+            Click or press Enter to expand <ChevronRight size={14} />
           </p>
         )}
       </div>
@@ -53,7 +67,11 @@ const TimelineStep = ({ step, index, isActive, onToggle }) => {
 const Timeline = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const steps = [
+  const toggleIndex = useCallback((index) => {
+    setActiveIndex(prev => prev === index ? -1 : index);
+  }, []);
+
+  const steps = useMemo(() => [
     {
       period: "Spring (Year Before)",
       title: "Candidate Registration",
@@ -110,23 +128,23 @@ const Timeline = () => {
       description: "Congress counts the electoral votes and the new President is sworn into office.",
       details: ["Congressional Certification", "Oath of Office", "Peaceful Transfer of Power"]
     }
-  ];
+  ], []);
 
   return (
     <div className="max-w-3xl mx-auto py-8">
-      <div className="mb-12 text-center">
+      <header className="mb-12 text-center">
         <h2 className="text-3xl font-bold mb-4">The Election Cycle</h2>
         <p className="text-slate-400">Follow the path from registration to the White House.</p>
-      </div>
+      </header>
 
-      <div className="relative">
+      <div className="relative" role="list">
         {steps.map((step, index) => (
           <TimelineStep 
             key={index} 
             step={step} 
             index={index} 
             isActive={activeIndex === index}
-            onToggle={() => setActiveIndex(activeIndex === index ? -1 : index)}
+            onToggle={() => toggleIndex(index)}
           />
         ))}
       </div>

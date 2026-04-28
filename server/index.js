@@ -89,12 +89,28 @@ app.get('/api/voter-info', async (req, res) => {
   }
 });
 
+const { TranslationServiceClient } = require('@google-cloud/translate');
+const translationClient = new TranslationServiceClient();
+
 // 3. Translation API
 app.post('/api/translate', async (req, res) => {
   try {
     const { text, target } = req.body;
-    res.json({ translatedText: text }); 
+    if (!process.env.GOOGLE_CLOUD_PROJECT) {
+      return res.json({ translatedText: text }); // Fallback
+    }
+
+    const request = {
+      parent: `projects/${process.env.GOOGLE_CLOUD_PROJECT}/locations/global`,
+      contents: [text],
+      mimeType: 'text/plain',
+      targetLanguageCode: target,
+    };
+
+    const [response] = await translationClient.translateText(request);
+    res.json({ translatedText: response.translations[0].translatedText });
   } catch (error) {
+    console.error('Translation Error:', error);
     res.status(500).json({ error: 'Translation failed' });
   }
 });
